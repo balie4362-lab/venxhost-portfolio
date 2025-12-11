@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VenxHosts — Bio / Panel</title>
+  <style>
+    /* Fonts & base */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+    :root{
+      --bg-dark:#060712; --bg-light:#f7f8fb; --neon-1:#7c5cff; --neon-2:#00e6d8;
+      --card: rgba(255,255,255,0.03); --glass: rgba(255,255,255,0.04);
+      --muted: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,var(--bg-dark) 0%, #030416 60%); color:#eaf1ff; -webkit-font-smoothing:antialiased;
+      display:flex; align-items:center; justify-content:center; padding:28px;
+    }
+
+    /* container */
+    .card{
+      width:100%; max-width:920px; border-radius:20px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04);
+      padding:28px; position:relative; overflow:hidden; box-shadow:0 20px 60px rgba(3,6,12,0.7);
+    }
+
+    /* Animated neon shapes */
+    .glow-blob{position:absolute; filter:blur(36px); opacity:0.9; mix-blend-mode:screen}
+    .b1{width:420px;height:420px; right:-120px; top:-80px; background:radial-gradient(circle at 30% 30%, var(--neon-1), transparent 40%);} 
+    .b2{width:320px;height:320px; left:-80px; bottom:-120px; background:radial-gradient(circle at 50% 50%, var(--neon-2), transparent 40%);} 
+
+    header{display:flex; gap:18px; align-items:center}
+    .logo-wrap{display:flex; gap:12px; align-items:center}
+    .logo{
+      width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--neon-1),#4f7bff);display:grid;place-items:center;box-shadow:0 10px 30px rgba(124,92,255,0.18), inset 0 -6px 30px rgba(255,255,255,0.03);
+      font-weight:800;font-size:28px;letter-spacing:2px;color:white;font-variant:small-caps; text-transform:lowercase;
+    }
+    .brand{display:flex;flex-direction:column}
+    .brand h1{font-size:20px;margin:0;font-weight:800;letter-spacing:1px;text-transform:lowercase}
+    .tag{font-size:13px;color:var(--muted);margin-top:4px}
+
+    /* tagline bar */
+    .tagline{margin-top:18px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px 14px;border-radius:12px; display:flex;align-items:center;justify-content:space-between}
+    .tagline .text{font-weight:600}
+    .cta{display:flex;gap:10px}
+    .btn{background:linear-gradient(90deg,var(--neon-1),var(--neon-2));border:none;padding:10px 14px;border-radius:999px;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.4);transition:transform .18s ease}
+    .btn:active{transform:translateY(2px)}
+
+    /* links list */
+    .links{display:grid;grid-template-columns:1fr 1fr; gap:14px;margin-top:18px}
+    .link-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between}
+    .link-left{display:flex;gap:12px;align-items:center}
+    .fav{width:44px;height:44;border-radius:10px;display:grid;place-items:center;font-weight:700}
+    .link-title{font-weight:700}
+    .link-sub{color:var(--muted);font-size:13px}
+
+    /* plans section */
+    .plans{display:flex;gap:12px;margin-top:18px}
+    .plan{flex:1;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03)}
+    .plan h3{margin:0 0 6px 0}
+    .plan p{color:var(--muted);margin:0 0 12px 0}
+    .plan .price{font-size:18px;font-weight:800}
+
+    /* admin panel */
+    .admin-bar{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.85));backdrop-filter:blur(6px);z-index:60}
+    .modal.show{display:flex}
+    .modal-card{width:100%;max-width:560px;background:linear-gradient(180deg,#070814,#060711);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.04)}
+    .form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    input,textarea,select{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px;color:inherit}
+
+    /* small screen */
+    @media (max-width:700px){
+      .links{grid-template-columns:1fr}
+      .plans{flex-direction:column}
+      header{flex-direction:column;align-items:flex-start}
+    }
+
+    /* subtle animated outlines */
+    .logo::after{content:'';position:absolute;left:0;top:0;width:100%;height:100%;border-radius:14px;box-shadow:0 0 40px rgba(124,92,255,0.45);opacity:.6;mix-blend-mode:screen}
+
+    /* floating particle canvas */
+    canvas#particles{position:absolute;inset:0;z-index:1;pointer-events:none}
+
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+    <canvas id="particles"></canvas>
+    <div class="glow-blob b1"></div>
+    <div class="glow-blob b2"></div>
+
+    <div style="position:relative;z-index:2">
+      <header>
+        <div class="logo-wrap">
+          <div class="logo">vx</div>
+          <div class="brand">
+            <h1 style="font-variant:small-caps;">venxhosts</h1>
+            <div class="tag">Spend less · Get More</div>
+          </div>
+        </div>
+        <div style="margin-left:auto;color:var(--muted);font-weight:600">Bio · Panel</div>
+      </header>
+
+      <div class="tagline">
+        <div class="text">Futuristic, fast hosting — powered by Pterodactyl</div>
+        <div class="cta">
+          <button class="btn" id="orderBtn">Order Now</button>
+          <button class="btn" id="discordBtn">Join Discord</button>
+        </div>
+      </div>
+
+      <section class="links" id="links">
+        <!-- link cards generated by JS -->
+      </section>
+
+      <div class="plans" id="plans">
+        <div class="plan">
+          <h3>Basic</h3>
+          <p>Starter — perfect for small bots & testing</p>
+          <div class="price">₹29 / month</div>
+        </div>
+        <div class="plan">
+          <h3>Gamer</h3>
+          <p>Good for small Minecraft servers</p>
+          <div class="price">₹129 / month</div>
+        </div>
+        <div class="plan">
+          <h3>Pro</h3>
+          <p>High performance, low-latency</p>
+          <div class="price">₹499 / month</div>
+        </div>
+      </div>
+
+      <div class="admin-bar">
+        <button class="ghost" id="adminOpen">Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- modal for admin -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h3 style="margin:0 0 10px 0">Admin Panel</h3>
+      <div class="form-row">
+        <label><strong>Login</strong></label>
+        <input id="admUser" placeholder="username" value="admin">
+        <input id="admPass" placeholder="password" type="password" value="Venx@123">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button class="btn" id="admLogin">Login</button>
+          <button class="ghost" id="closeModal">Close</button>
+        </div>
+      </div>
+
+      <div id="adminArea" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="color:var(--muted);font-size:13px">Logged in as <span id="who">admin</span></div>
+          <button class="ghost" id="logoutBtn">Logout</button>
+        </div>
+
+        <hr style="margin:10px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+        <div class="form-row">
+          <label>Add / Update Link</label>
+          <input id="linkTitle" placeholder="Panel (example)" value="Panel">
+          <input id="linkUrl" placeholder="https://panel.example.com" value="https://panel.venxhosts.me">
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="addLink">Save Link</button>
+            <button class="ghost" id="resetStore">Reset Stored Links</button>
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <strong style="font-size:13px">Saved links</strong>
+          <div id="savedList" style="margin-top:8px"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /*********** Simple particle backdrop ***********/
+    const cvs = document.getElementById('particles');
+    const ctx = cvs.getContext('2d');
+    function resize(){cvs.width = window.innerWidth; cvs.height = window.innerHeight}
+    window.addEventListener('resize', resize); resize();
+    const particles = [];
+    for(let i=0;i<80;i++) particles.push({x:Math.random()*cvs.width,y:Math.random()*cvs.height,r:Math.random()*1.6+0.4,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,alpha:Math.random()*0.7+0.05});
+    function tick(){ctx.clearRect(0,0,cvs.width,cvs.height); for(const p of particles){p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=cvs.width; if(p.x>cvs.width)p.x=0; if(p.y<0)p.y=cvs.height; if(p.y>cvs.height)p.y=0; ctx.beginPath(); ctx.fillStyle = 'rgba(124,92,255,'+p.alpha+')'; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();} requestAnimationFrame(tick)} tick();
+
+    /*********** Links storage and rendering ***********/
+    const DEFAULTS = [{id:'panel',title:'Panel',url:'https://panel.venxhosts.me',desc:'Login to your panel'}];
+    function loadLinks(){ try{const s = localStorage.getItem('vh_links'); return s?JSON.parse(s):DEFAULTS;}catch(e){return DEFAULTS}}
+    function saveLinks(arr){ localStorage.setItem('vh_links', JSON.stringify(arr)); }
+    function renderLinks(){ const wrap = document.getElementById('links'); wrap.innerHTML=''; const arr = loadLinks(); arr.forEach(link=>{
+      const el = document.createElement('div'); el.className='link-card';
+      el.innerHTML = `<div class='link-left'><div class='fav' style='background:linear-gradient(135deg,var(--neon-1),var(--neon-2));color:#021; font-weight:800'>${link.title[0]||'V'}</div><div><div class='link-title'>${link.title}</div><div class='link-sub'>${link.desc||link.url}</div></div></div><div style='display:flex;gap:8px;align-items:center'><a class='btn' href='${link.url}' target='_blank' rel='noopener'>Open</a></div>`;
+      wrap.appendChild(el);
+    })}
+    renderLinks();
+
+    /*********** Admin logic (client-side demo) ***********/
+    const modal = document.getElementById('modal');
+    const adminOpen = document.getElementById('adminOpen');
+    const closeModal = document.getElementById('closeModal');
+    const admLogin = document.getElementById('admLogin');
+    const adminArea = document.getElementById('adminArea');
+    const who = document.getElementById('who');
+    const admUser = document.getElementById('admUser');
+    const admPass = document.getElementById('admPass');
+
+    // default admin credentials (change after first login in code or implement server auth later)
+    const ADMIN_KEY = 'vh_admin'; // store hashed creds
+    function defaultAdmin(){ return {user:'admin',pass:'Venx@123'} }
+    function getStoredAdmin(){ try{const s = localStorage.getItem(ADMIN_KEY); return s?JSON.parse(s):defaultAdmin()}catch(e){return defaultAdmin()} }
+
+    function openModal(){ modal.classList.add('show'); }
+    function closeModalFn(){ modal.classList.remove('show'); }
+    adminOpen.onclick = openModal; closeModal.onclick = closeModalFn; window.onclick = (e)=>{ if(e.target===modal) closeModalFn(); }
+
+    function showAdminArea(name){ adminArea.style.display='block'; who.textContent = name; }
+    function hideAdminArea(){ adminArea.style.display='none'; }
+
+    admLogin.onclick = ()=>{
+      const enteredUser = admUser.value.trim(); const enteredPass = admPass.value;
+      const stored = getStoredAdmin();
+      if(enteredUser === stored.user && enteredPass === stored.pass){
+        showAdminArea(stored.user);
+        // show saved links list
+        refreshSavedList();
+      } else {
+        alert('Invalid admin credentials (client-side demo). Default is user: admin pass: Venx@123');
+      }
+    }
+
+    document.getElementById('logoutBtn').onclick = ()=>{ hideAdminArea(); admUser.value='admin'; admPass.value=''; }
+
+    // add link
+    document.getElementById('addLink').onclick = ()=>{
+      const t = document.getElementById('linkTitle').value.trim();
+      const u = document.getElementById('linkUrl').value.trim();
+      if(!t||!u){ alert('Provide title and url'); return }
+      const arr = loadLinks(); const id = Date.now().toString(); arr.unshift({id,title:t,url:u,desc:'Click to open'}); saveLinks(arr); renderLinks(); refreshSavedList();
+    }
+
+    // reset
+    document.getElementById('resetStore').onclick = ()=>{ if(confirm('Reset saved links to defaults?')){ saveLinks(DEFAULTS); renderLinks(); refreshSavedList(); alert('Links reset') } }
+
+    function refreshSavedList(){ const box = document.getElementById('savedList'); box.innerHTML=''; const arr = loadLinks(); arr.forEach(l=>{
+      const row = document.createElement('div'); row.style.display='flex'; row.style.alignItems='center'; row.style.justifyContent='space-between'; row.style.marginBottom='6px'; row.innerHTML = `<div style='font-size:13px'>${l.title} — <span style='color:var(--muted);font-size:12px'>${l.url}</span></div>`;
+      const right = document.createElement('div'); right.style.display='flex'; right.style.gap='6px';
+      const del = document.createElement('button'); del.className='ghost'; del.textContent='Delete'; del.onclick=()=>{ if(confirm('Delete this link?')){ const newArr = loadLinks().filter(x=>x.id!==l.id); saveLinks(newArr); renderLinks(); refreshSavedList(); } };
+      right.appendChild(del);
+      row.appendChild(right);
+      box.appendChild(row);
+    })}
+
+    // show default admin creds somewhere (visible to site owner only)
+    // The user asked to "give admin username and pass" — defaults are below (client-only demo):
+    console.log('VenxHosts demo admin -> username: admin   password: Venx@123');
+
+    // quick handlers for CTA buttons (you can replace these urls)
+    document.getElementById('orderBtn').onclick = ()=>{ window.open('https://panel.venxhosts.me', '_blank') }
+    document.getElementById('discordBtn').onclick = ()=>{ window.open('https://discord.gg/', '_blank') }
+
+    // small enhancement: allow drag-to-reorder? (omitted for brevity)
+
+  </script>
+</body>
+</html>
